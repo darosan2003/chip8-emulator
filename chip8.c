@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
 #include "chip8.h"
 
 void initialize_chip(chip8_t *chip8) {

@@ -9,7 +9,7 @@ OBJ_DIR = /obj/
 # Variable to store the targets
 TARGET = chip8
 # Variable to store the objects
-OBJ = main.o chip8.o
+OBJ = main.o chip8.o stack.o
 
 .PHONY: all
 all: dir $(TARGET)
