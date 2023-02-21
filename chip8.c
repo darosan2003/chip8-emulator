@@ -30,12 +30,12 @@ void initialize_chip(chip8_t *chip8) {
 
 }
 
-void load_rom(chip8_t *chip8) {
+void load_rom(chip8_t *chip8, char *rom_name) {
 
   FILE *fp;
   int file_size;
 
-  if((fp = fopen("snake.ch8", "r")) == NULL) {
+  if((fp = fopen(rom_name, "r")) == NULL) {
   	fprintf(stderr, "[-] ERROR. Could not find ROM\n");
   	exit(2);
   }

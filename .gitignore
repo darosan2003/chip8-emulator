@@ -1,3 +1,2 @@
-/obj
-chip8
-snake.ch8
+obj/
+roms/
