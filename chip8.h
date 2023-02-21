@@ -14,8 +14,10 @@ typedef struct {
   uint8_t v[REG_NUM];
   uint8_t dt, st;
   uint16_t i, pc, sp;
-  stack_t stack;
+  stack_t *stack;
 } chip8_t;
 #endif
+
+void initialize_chip(chip8_t *);
 
 #endif
