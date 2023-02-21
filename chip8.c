@@ -128,7 +128,7 @@ int process_opcode(uint16_t opcode) {
           printf("SUBN v[%x] v[%x]\n", x, y);
           break;
 
-        case 0x08:
+        case 0x0E:
           printf("SHL v[%x]\n", x);
           break;
       }
@@ -138,40 +138,40 @@ int process_opcode(uint16_t opcode) {
         printf("SNE v[%x] v[%x]\n", x, y);
         break;
 
-      case 0x0a:
+      case 0x0A:
         printf("LD i %x\n", nnn);
         break;
 
-      case 0x0b:
+      case 0x0B:
         printf("JP %x + v[0]\n", nnn);
         break;
 
-      case 0x0c:
+      case 0x0C:
         printf("RND v[%x] %x (v[%x] = RND | %x)\n", x, kk, x, kk);
         break;
 
-      case 0x0d:
+      case 0x0D:
         printf("DRW v[%x] v[%x] %x\n", x, y, lsd);
         break;
 
-      case 0x0e:
+      case 0x0E:
         switch(kk) {
-          case 0x9e:
+          case 0x9E:
             printf("SKP v[%x] (if key = v[%x])\n", x, x);
             break;
 
-          case 0xa1:
+          case 0xA1:
             printf("SKNP v[%x] (if key != v[%x])\n", x, x);
         }
         break;
 
-      case 0x0f:
+      case 0x0F:
         switch(kk) {
           case 0x07:
             printf("LD v[%x] dt\n", x);
             break;
 
-          case 0x0a:
+          case 0x0A:
             printf("LD v[%x] k (wait until key pressed)\n", x);
             break;
 
@@ -183,7 +183,7 @@ int process_opcode(uint16_t opcode) {
             printf("LD st v[%x]\n", x);
             break;
 
-          case 0x1e:
+          case 0x1E:
             printf("ADD i v[%x]\n", x);
             break;
 
