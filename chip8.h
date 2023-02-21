@@ -19,5 +19,6 @@ typedef struct {
 #endif
 
 void initialize_chip(chip8_t *);
+void load_rom(chip8_t *);
 
 #endif
