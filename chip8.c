@@ -156,50 +156,50 @@ int process_opcode(uint16_t opcode) {
 
       case 0x0e:
         switch(kk) {
-          case 0x009e:
+          case 0x9e:
             printf("SKP v[%x] (if key = v[%x])\n", x, x);
             break;
 
-          case 0x00a1:
+          case 0xa1:
             printf("SKNP v[%x] (if key != v[%x])\n", x, x);
         }
         break;
 
       case 0x0f:
         switch(kk) {
-          case 0x0007:
+          case 0x07:
             printf("LD v[%x] dt\n", x);
             break;
 
-          case 0x000a:
+          case 0x0a:
             printf("LD v[%x] k (wait until key pressed)\n", x);
             break;
 
-          case 0x0015:
+          case 0x15:
             printf("LD dt v[%x]\n", x);
             break;
 
-          case 0x0018:
+          case 0x18:
             printf("LD st v[%x]\n", x);
             break;
 
-          case 0x001e:
+          case 0x1e:
             printf("ADD i v[%x]\n", x);
             break;
 
-          case 0x0029:
+          case 0x29:
             printf("LD f v[%x]\n", x);
             break;
 
-          case 0x0033:
+          case 0x33:
             printf("LD b v[%x]\n", x);
             break;
 
-          case 0x0055:
+          case 0x55:
             printf("LD [i] v[%x]\n", x);
             break;
 
-          case 0x0065:
+          case 0x65:
             printf("LD v[%x] [i]\n", x);
             break;
         }
