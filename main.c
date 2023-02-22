@@ -17,13 +17,10 @@ int main(int argc, char **argv) {
 
   while(!exit) {
 
-    if(chip8.pc == MEM_SIZE || chip8.pc + 1 == MEM_SIZE)
-      chip8.pc = 0;
+    chip8.pc = (chip8.pc + 2) % MEM_SIZE;
 
     uint16_t opcode = (chip8.mem[chip8.pc] << 8) | chip8.mem[chip8.pc + 1];
     exit = process_opcode(opcode);
-
-    chip8.pc += 2;
 
   }
 

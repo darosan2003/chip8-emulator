@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "chip8.h"
 #include "stack.h"
 
@@ -11,12 +12,9 @@ void initialize_chip(chip8_t *chip8) {
   chip8->sp = 0x00;
   chip8->pc = 0x200;
 
-  for(int i=0; i<REG_NUM; i++)
-    chip8->v[i] = 0x00;
+  memset(chip8->v, 0x00, sizeof(chip8->v));
+  memset(chip8->mem, 0x00, sizeof(chip8->mem));
 
-  for(int i=0; i<MEM_SIZE; i++)
-    chip8->mem[i] = 0x00;
- 
   if(chip8->stack != NULL) {
     while(!empty_stack(chip8->stack))
       delete_stack(chip8->stack);
