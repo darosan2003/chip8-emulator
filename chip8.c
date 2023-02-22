@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +48,7 @@ void load_rom(chip8_t *chip8, char *rom_name) {
 
 }
 
-int process_opcode(uint16_t opcode) {
+int process_opcode(chip8_t *chip8, uint16_t opcode) {
 
   uint8_t msd  = opcode >> 12;
   uint8_t x    = (opcode >> 8) & 0x0F;
@@ -65,7 +66,7 @@ int process_opcode(uint16_t opcode) {
       break;
 
     case 0x01:
-      printf("JP %x\n", nnn);
+      chip8->pc = nnn;
       break;
 
     case 0x02:
@@ -73,49 +74,54 @@ int process_opcode(uint16_t opcode) {
       break;
 
     case 0x03:
-      printf("SE (if v[%x] == %x)\n", x, kk);
+      if(chip8->v[x] == kk)
+        chip8->pc = (chip8->pc + 2) % MEM_SIZE;
       break;
 
     case 0x04:
-      printf("SNE (if v[%x] != %x)\n", x, kk);
+      if(chip8->v[x] != kk)
+        chip8->pc = (chip8->pc + 2) % MEM_SIZE;
       break;
 
     case 0x05:
-      printf("SE v[%x] v[%x]\n", x, y);
+      if(chip8->v[x] == chip8->v[y])
+        chip8->pc = (chip8->pc + 2) % MEM_SIZE;
       break;
 
     case 0x06:
-      printf("LD v[%x] %x\n", x, kk);
+      chip8->v[x] = kk;
       break;
 
     case 0x07:
-      printf("ADD v[%x] %x\n", x, kk);
+      chip8->v[x] = (chip8->v[x] + kk) % UINT8_MAX;
       break;
 
     case 0x08:
       switch(lsd) {
         case 0x00:
-          printf("LD v[%x] v[%x]\n", x, y);
+          chip8->v[x] = chip8->v[y];
           break;
 
         case 0x01:
-          printf("OR v[%x] v[%x]\n", x, y);
+          chip8->v[x] |= chip8->v[y];
           break;
 
         case 0x02:
-          printf("AND v[%x] v[%x]\n", x, y);
+          chip8->v[x] &= chip8->v[y];
           break;
 
         case 0x03:
-          printf("XOR v[%x] v[%x]\n", x, y);
+          chip8->v[x] ^= chip8->v[y];
           break;
 
         case 0x04:
-          printf("ADD v[%x] v[%x]\n", x, y);
+          chip8->v[0x0F] = (chip8->v[x] > chip8->v[x] + chip8->v[y]);
+          chip8->v[x] += chip8->v[y];
           break;
 
         case 0x05:
-          printf("SUB v[%x] v[%x]\n", x, y);
+          chip8->v[0x0F] = (chip8->v[x] > chip8->v[y]);
+          chip8->v[x] -= chip8->v[y];
           break;
 
         case 0x06:

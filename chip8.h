@@ -18,8 +18,8 @@ typedef struct {
 } chip8_t;
 #endif
 
-int process_opcode(uint16_t);
 void initialize_chip(chip8_t *);
 void load_rom(chip8_t *, char *);
+int process_opcode(chip8_t *, uint16_t);
 
 #endif

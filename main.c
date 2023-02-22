@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     chip8.pc = (chip8.pc + 2) % MEM_SIZE;
 
     uint16_t opcode = (chip8.mem[chip8.pc] << 8) | chip8.mem[chip8.pc + 1];
-    exit = process_opcode(opcode);
+    exit = process_opcode(&chip8, opcode);
 
   }
 
