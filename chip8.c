@@ -35,8 +35,8 @@ void load_rom(chip8_t *chip8, char *rom_name) {
   int file_size;
 
   if((fp = fopen(rom_name, "r")) == NULL) {
-  	fprintf(stderr, "[-] ERROR. Could not find ROM\n");
-  	exit(2);
+    fprintf(stderr, "[-] ERROR. Could not find ROM\n");
+    exit(2);
   }
 
   fseek(fp, 0, SEEK_END);
@@ -125,29 +125,33 @@ int process_opcode(chip8_t *chip8, uint16_t opcode) {
           break;
 
         case 0x06:
-          printf("SHR v[%x]\n", x);
+          chip8->v[0x0F] = (chip8->v[x] & 0x01);
+          chip8->v[x] >>= 1;
           break;
 
         case 0x07:
-          printf("SUBN v[%x] v[%x]\n", x, y);
+          chip8->v[0x0F] = (chip8->v[y] > chip8->v[x]);
+          chip8->v[y] -= chip8->v[x];
           break;
 
-        case 0x0E:
-          printf("SHL v[%x]\n", x);
+        case 0x0E: 
+          chip8->v[0x0F] = (chip8->v[x] & (1 << 7)) ? 1 : 0;
+          chip8->v[x] <<= 1;
           break;
       }
       break;
 
       case 0x09:
-        printf("SNE v[%x] v[%x]\n", x, y);
+        if(chip8->v[x] != chip8->v[y])
+          chip8->pc = (chip8->pc + 2) % MEM_SIZE;
         break;
 
       case 0x0A:
-        printf("LD i %x\n", nnn);
+        chip8->i = nnn;
         break;
 
       case 0x0B:
-        printf("JP %x + v[0]\n", nnn);
+        chip8->pc = (chip8->pc + chip8->v[0x00] + nnn) % MEM_SIZE;
         break;
 
       case 0x0C:
