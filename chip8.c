@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "chip8.h"
-#include "stack.h"
 
 void initialize_chip(chip8_t *chip8) {
   
@@ -14,18 +13,8 @@ void initialize_chip(chip8_t *chip8) {
   chip8->pc = 0x200;
 
   memset(chip8->v, 0x00, sizeof(chip8->v));
+  memset(chip8->stack, 0x00, sizeof(chip8->stack));
   memset(chip8->mem, 0x00, sizeof(chip8->mem));
-
-  if(chip8->stack != NULL) {
-    while(!empty_stack(chip8->stack))
-      delete_stack(chip8->stack);
-  }else {
-    if((chip8->stack = malloc(sizeof(stack_t))) == NULL) {
-      printf("[-] ERROR. Unable to create stack\n");
-      exit(1);
-    }
-    create_stack(chip8->stack);
-  }
 
 }
 
