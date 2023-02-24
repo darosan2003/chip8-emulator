@@ -176,7 +176,7 @@ int process_opcode(chip8_t *chip8, uint16_t opcode) {
       case 0x0F:
         switch(kk) {
           case 0x07:
-            printf("LD v[%x] dt\n", x);
+            chip8->v[x] = chip8->dt;
             break;
 
           case 0x0A:
@@ -184,15 +184,15 @@ int process_opcode(chip8_t *chip8, uint16_t opcode) {
             break;
 
           case 0x15:
-            printf("LD dt v[%x]\n", x);
+            chip8->dt = chip8->v[x];
             break;
 
           case 0x18:
-            printf("LD st v[%x]\n", x);
+            chip8->st = chip8->v[x];
             break;
 
           case 0x1E:
-            printf("ADD i v[%x]\n", x);
+            chip8->i += chip8->v[x];
             break;
 
           case 0x29:
