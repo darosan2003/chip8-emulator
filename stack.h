@@ -1,9 +1,11 @@
 #ifndef __STACK_H
 #define __STACK_H
 
+#include <stdint.h>
+
 #ifndef __INFO__T
 #define __INFO__T
-typedef int info_t;
+typedef uint16_t info_t;
 #endif
 
 #ifndef __NODE__T
