@@ -4,12 +4,14 @@
 #include <stdint.h>
 
 #define REG_NUM    16
-#define MEM_SIZE   4096
 #define STACK_SIZE 16
+#define SCRN_SIZE  2048
+#define MEM_SIZE   4096
 
 #ifndef __CHIP8__T
 #define __CHIP8__T
 typedef struct {
+  char screen[SCRN_SIZE];
   uint8_t mem[MEM_SIZE];
   uint8_t v[REG_NUM];
   uint8_t dt, st;
@@ -20,6 +22,7 @@ typedef struct {
 
 void initialize_chip(chip8_t *);
 void load_rom(chip8_t *, char *);
-int process_opcode(chip8_t *, uint16_t);
+void step_forward(chip8_t *);
+void process_opcode(chip8_t *, uint16_t);
 
 #endif

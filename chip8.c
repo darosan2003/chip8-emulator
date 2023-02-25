@@ -37,7 +37,16 @@ void load_rom(chip8_t *chip8, char *rom_name) {
 
 }
 
-int process_opcode(chip8_t *chip8, uint16_t opcode) {
+void step_forward(chip8_t *chip8) {
+
+	chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+
+	uint16_t opcode = (chip8->mem[chip8->pc] << 8 | chip8->mem[chip8->pc + 1]);
+	process_opcode(chip8, opcode);
+
+}
+
+void process_opcode(chip8_t *chip8, uint16_t opcode) {
 
   uint8_t msd  = opcode >> 12;
   uint8_t x    = (opcode >> 8) & 0x0F;
@@ -202,7 +211,5 @@ int process_opcode(chip8_t *chip8, uint16_t opcode) {
         }
         break;
   }
-
-  return 0;
 
 }
