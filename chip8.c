@@ -1,8 +1,14 @@
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "chip8.h"
+
+void conversion(char *scr, uint32_t *pixels) {
+
+  for(int i=0; i<SCRN_SIZE; i++)
+    pixels[i] = scr[i] ? -1 : 0;
+
+}
 
 void initialize_chip(chip8_t *chip8) {
   

@@ -3,7 +3,7 @@ CC = gcc
 # Variables for compiler flags
 CFLAGS = -Wall -c -g3
 # Variables for linking flags
-CLINKERS = -o
+CLINKERS = -lSDL2 -o
 # Variable for object directory
 OBJ_DIR = /obj/
 # Variable to store the targets

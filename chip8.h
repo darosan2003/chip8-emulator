@@ -20,6 +20,7 @@ typedef struct {
 } chip8_t;
 #endif
 
+void conversion(char *, uint32_t *);
 void initialize_chip(chip8_t *);
 void load_rom(chip8_t *, char *);
 void step_forward(chip8_t *);
