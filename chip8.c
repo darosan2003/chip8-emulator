@@ -64,9 +64,11 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
   switch(msd) {
     case 0x00:
       if(opcode == 0x00E0)
-        printf("CLS\n");
-      else if(opcode == 0x00EE)
-        printf("RET\n");
+	memset(chip8->screen, 0x00, SCRN_SIZE);
+      else if(opcode == 0x00EE) {
+	if(chip8->sp > 0)
+          chip8->pc = chip8->stack[--chip8->sp];
+      }
       break;
 
     case 0x01:
@@ -74,7 +76,9 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
       break;
 
     case 0x02:
-      printf("CALL %x\n", nnn);
+      if(chip8->sp < STACK_SIZE)
+      	chip8->stack[chip8->sp++] = chip8->pc;
+      chip8->pc = nnn;
       break;
 
     case 0x03:
@@ -159,7 +163,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         break;
 
       case 0x0C:
-        printf("RND v[%x] %x (v[%x] = RND | %x)\n", x, kk, x, kk);
+	chip8->v[x] = rand() % UINT8_MAX & kk;
         break;
 
       case 0x0D:
