@@ -168,12 +168,14 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         break;
 
       case 0x0D:
-        for(int i=0; i<lsd; i++) {
-	  uint8_t sprite = chip8->mem[chip8->i];
+        chip8->v[0x0F] = 0;
+	for(int i=0; i<lsd; i++) {
+	  uint8_t sprite = chip8->mem[chip8->i + i];
 	  for(int j=0; j<7; j++) {
 	    int px = (chip8->v[x] + j) & (TEXTURE_WIDTH - 1);
 	    int py = (chip8->v[y] + i) & (TEXTURE_HEIGHT - 1);
-	    chip8->screen[TEXTURE_WIDTH * py + px] = (sprite & (1 << (7 - j))) != 0;
+	    chip8->v[0x0F] |= chip8->screen[TEXTURE_WIDTH * py + px] & ((sprite & (1 << (7 - j))) != 0);
+	    chip8->screen[TEXTURE_WIDTH * py + px] ^= (sprite & (1 << (7 - j))) != 0;
 	  }
 	}
         break;
