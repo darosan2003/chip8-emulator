@@ -21,6 +21,7 @@ void initialize_chip(chip8_t *chip8) {
   memset(chip8->v, 0x00, sizeof(chip8->v));
   memset(chip8->stack, 0x00, sizeof(chip8->stack));
   memset(chip8->mem, 0x00, sizeof(chip8->mem));
+  memset(chip8->screen, 0x00, sizeof(chip8->screen));
 
 }
 
@@ -45,10 +46,10 @@ void load_rom(chip8_t *chip8, char *rom_name) {
 
 void step_forward(chip8_t *chip8) {
 
-	chip8->pc = (chip8->pc + 2) % MEM_SIZE;
-
-	uint16_t opcode = (chip8->mem[chip8->pc] << 8 | chip8->mem[chip8->pc + 1]);
-	process_opcode(chip8, opcode);
+  chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+	
+  uint16_t opcode = (chip8->mem[chip8->pc] << 8 | chip8->mem[chip8->pc + 1]);
+  process_opcode(chip8, opcode);
 
 }
 
@@ -76,7 +77,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
       break;
 
     case 0x02:
-      if(chip8->sp < STACK_SIZE)
+      if(chip8->sp < STACK_SIZE - 1)
       	chip8->stack[chip8->sp++] = chip8->pc;
       chip8->pc = nnn;
       break;
@@ -163,11 +164,18 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         break;
 
       case 0x0C:
-	chip8->v[x] = rand() % UINT8_MAX & kk;
+	chip8->v[x] = rand() & kk;
         break;
 
       case 0x0D:
-        printf("DRW v[%x] v[%x] %x\n", x, y, lsd);
+        for(int i=0; i<lsd; i++) {
+	  uint8_t sprite = chip8->mem[chip8->i];
+	  for(int j=0; j<7; j++) {
+	    int px = (chip8->v[x] + j) & (TEXTURE_WIDTH - 1);
+	    int py = (chip8->v[y] + i) & (TEXTURE_HEIGHT - 1);
+	    chip8->screen[TEXTURE_WIDTH * py + px] = (sprite & (1 << (7 - j))) != 0;
+	  }
+	}
         break;
 
       case 0x0E:

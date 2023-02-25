@@ -16,39 +16,44 @@ int main(int argc, char **argv) {
 
   chip8_t chip8;
   int quit = 0;
+  int last_ticks = 0;
 
   initialize_chip(&chip8);
   load_rom(&chip8, argv[1]);
-
-  for(int i=0; i<SCRN_SIZE; i++)
-    chip8.screen[i] = rand() % 2;
 
   SDL_Init(SDL_INIT_EVERYTHING);
 
   SDL_Window *win = SDL_CreateWindow("CHIP-8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 320, SDL_WINDOW_OPENGL);
   SDL_Renderer *rnd = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-  SDL_Texture *tex = SDL_CreateTexture(rnd, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 64, 32);
+  SDL_Texture *tex = SDL_CreateTexture(rnd, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH, TEXTURE_HEIGHT);
   SDL_Event ev;
 
   uint32_t *pixels;
   int pitch;
 
-  SDL_LockTexture(tex, NULL, (void **)&pixels, &pitch);
-  conversion(chip8.screen, pixels);
-  SDL_UnlockTexture(tex);
-
   while(!quit) {
 
-    //step_forward(&chip8);
+    while(SDL_PollEvent(&ev)) {
+      switch(ev.type) {
+        case SDL_QUIT:
+	  quit = 1;
+	  break;
+      }
+    }
 
-    SDL_RenderClear(rnd);
-    SDL_RenderCopy(rnd, tex, NULL, NULL);
-    SDL_RenderPresent(rnd);
-
-    SDL_WaitEvent(&ev);
-    if(ev.type == SDL_QUIT)
-	    quit = 1;
+    if(SDL_GetTicks() - last_ticks > (1000 / 60)) {
+      step_forward(&chip8);
   
+      SDL_LockTexture(tex, NULL, (void **)&pixels, &pitch);
+      conversion(chip8.screen, pixels);
+      SDL_UnlockTexture(tex);
+
+      SDL_RenderClear(rnd);
+      SDL_RenderCopy(rnd, tex, NULL, NULL);
+      SDL_RenderPresent(rnd);
+      last_ticks = SDL_GetTicks();
+    }
+
   }
 
   SDL_DestroyTexture(tex);

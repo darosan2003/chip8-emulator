@@ -3,10 +3,12 @@
 
 #include <stdint.h>
 
-#define REG_NUM    16
-#define STACK_SIZE 16
-#define SCRN_SIZE  2048
-#define MEM_SIZE   4096
+#define REG_NUM		16
+#define STACK_SIZE	16
+#define TEXTURE_HEIGHT	32
+#define TEXTURE_WIDTH	64
+#define SCRN_SIZE	2048
+#define MEM_SIZE	4096
 
 #ifndef __CHIP8__T
 #define __CHIP8__T
