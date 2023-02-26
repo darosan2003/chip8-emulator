@@ -3,6 +3,25 @@
 #include <string.h>
 #include "chip8.h"
 
+char number_hexcodes[] = {
+  0xF0, 0x90, 0x90, 0x90, 0xF0,
+  0x20, 0x60, 0x20, 0x20, 0x70,
+  0xF0, 0x10, 0xF0, 0x80, 0xF0,
+  0xF0, 0x10, 0xF0, 0x10, 0xF0,
+  0x90, 0x90, 0xF0, 0x10, 0x10,
+  0xF0, 0x80, 0xF0, 0x10, 0xF0,
+  0xF0, 0x80, 0xF0, 0x90, 0xF0,
+  0xF0, 0x10, 0x20, 0x40, 0x40,
+  0xF0, 0x90, 0xF0, 0x90, 0xF0,
+  0xF0, 0x90, 0xF0, 0x10, 0xF0,
+  0xF0, 0x90, 0xF0, 0x90, 0x90,
+  0xE0, 0x90, 0xE0, 0x90, 0xE0,
+  0xF0, 0x80, 0x80, 0x80, 0xF0,
+  0xE0, 0x90, 0x90, 0x90, 0xE0,
+  0xF0, 0x80, 0xF0, 0x80, 0xF0,
+  0xF0, 0x80, 0xF0, 0x80, 0x80
+};
+
 void conversion(char *scr, uint32_t *pixels) {
 
   for(int i=0; i<SCRN_SIZE; i++)
@@ -12,16 +31,9 @@ void conversion(char *scr, uint32_t *pixels) {
 
 void initialize_chip(chip8_t *chip8) {
   
-  chip8->i  = 0x00;
-  chip8->dt = 0x00;
-  chip8->st = 0x00;
-  chip8->sp = 0x00;
+  memset(chip8, 0x00, sizeof(chip8_t));
+  memcpy(chip8->mem + 0x50, number_hexcodes, sizeof(number_hexcodes));
   chip8->pc = 0x200;
-
-  memset(chip8->v, 0x00, sizeof(chip8->v));
-  memset(chip8->stack, 0x00, sizeof(chip8->stack));
-  memset(chip8->mem, 0x00, sizeof(chip8->mem));
-  memset(chip8->screen, 0x00, sizeof(chip8->screen));
 
 }
 
@@ -214,19 +226,23 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
             break;
 
           case 0x29:
-            printf("LD f v[%x]\n", x);
+            chip8->i = 0x50 + (chip8->v[x] & 0x0F) * 5;
             break;
 
           case 0x33:
-            printf("LD b v[%x]\n", x);
+	    chip8->mem[chip8->i] = chip8->v[x] / 100 % 10;
+	    chip8->mem[chip8->i + 1] = chip8->v[x] / 10 % 10;
+	    chip8->mem[chip8->i + 2] = chip8->v[x] % 10;
             break;
 
           case 0x55:
-            printf("LD [i] v[%x]\n", x);
+	    for(int i=0; i<=x; i++)
+	      chip8->mem[chip8->i + i] = chip8->v[i];
             break;
 
           case 0x65:
-            printf("LD v[%x] [i]\n", x);
+	    for(int i=0; i<=x; i++)
+	      chip8->v[i] = chip8->mem[chip8->i + i];
             break;
         }
         break;
