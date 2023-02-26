@@ -59,7 +59,7 @@ void conversion(char *scr, uint32_t *pixels) {
 }
 
 void initialize_chip(chip8_t *chip8) {
-  
+ 
   memset(chip8, 0x00, sizeof(chip8_t));
   memcpy(chip8->mem + 0x50, number_hexcodes, sizeof(number_hexcodes));
   chip8->pc = 0x200;
@@ -88,9 +88,9 @@ void load_rom(chip8_t *chip8, char *rom_name) {
 
 void step_forward(chip8_t *chip8) {
 
-  chip8->pc = (chip8->pc + 2) % MEM_SIZE;
-	
-  uint16_t opcode = (chip8->mem[chip8->pc] << 8 | chip8->mem[chip8->pc + 1]);
+  chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
+
+  uint16_t opcode = (chip8->mem[chip8->pc] << 8) | chip8->mem[chip8->pc + 1];
   process_opcode(chip8, opcode);
 
 }
@@ -119,24 +119,24 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
       break;
 
     case 0x02:
-      if(chip8->sp < STACK_SIZE - 1)
+      if(chip8->sp < STACK_SIZE)
       	chip8->stack[chip8->sp++] = chip8->pc;
       chip8->pc = nnn;
       break;
 
     case 0x03:
       if(chip8->v[x] == kk)
-        chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+        chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
       break;
 
     case 0x04:
       if(chip8->v[x] != kk)
-        chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+        chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
       break;
 
     case 0x05:
       if(chip8->v[x] == chip8->v[y])
-        chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+        chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
       break;
 
     case 0x06:
@@ -144,7 +144,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
       break;
 
     case 0x07:
-      chip8->v[x] = (chip8->v[x] + kk) % UINT8_MAX;
+      chip8->v[x] = (chip8->v[x] + kk) & 0xff;
       break;
 
     case 0x08:
@@ -176,7 +176,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
           break;
 
         case 0x06:
-          chip8->v[0x0F] = (chip8->v[x] & 0x01);
+          chip8->v[0x0F] = (chip8->v[x] & 1);
           chip8->v[x] >>= 1;
           break;
 
@@ -194,7 +194,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
 
       case 0x09:
         if(chip8->v[x] != chip8->v[y])
-          chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+          chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
         break;
 
       case 0x0A:
@@ -202,7 +202,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         break;
 
       case 0x0B:
-        chip8->pc = (chip8->v[0x00] + nnn) % MEM_SIZE;
+        chip8->pc = (chip8->v[0x00] + nnn) & (MEM_SIZE - 1);
         break;
 
       case 0x0C:
@@ -229,12 +229,12 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         switch(kk) {
           case 0x9E:
             if(key_pressed(chip8->v[x]))
-              chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+              chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
             break;
 
           case 0xA1:
             if(!key_pressed(chip8->v[x]))
-	      chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+	      chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
             break;
 	}
         break;
@@ -266,10 +266,10 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
             break;
 
           case 0x33:
-	    chip8->mem[chip8->i] = chip8->v[x] / 100;
-	    chip8->mem[chip8->i + 1] = chip8->v[x] / 10 % 10;
 	    chip8->mem[chip8->i + 2] = chip8->v[x] % 10;
-            break;
+            chip8->mem[chip8->i + 1] = (chip8->v[x] / 10) % 10;
+	    chip8->mem[chip8->i] = chip8->v[x] / 100;
+	    break;
 
           case 0x55:
 	    for(int i=0; i<=x; i++)

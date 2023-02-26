@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
       conversion(chip8.screen, (uint32_t *)sur->pixels);
       SDL_UnlockTexture(tex);
 
-      SDL_RenderClear(rnd);
+      //SDL_RenderClear(rnd);
       SDL_RenderCopy(rnd, tex, NULL, NULL);
       SDL_RenderPresent(rnd);
       last_ticks = SDL_GetTicks();
