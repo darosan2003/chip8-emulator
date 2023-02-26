@@ -1,7 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL2/SDL.h>
 #include "chip8.h"
+
+char keys[] = {
+  SDL_SCANCODE_X,
+  SDL_SCANCODE_1,
+  SDL_SCANCODE_2,
+  SDL_SCANCODE_3,
+  SDL_SCANCODE_Q,
+  SDL_SCANCODE_W,
+  SDL_SCANCODE_E,
+  SDL_SCANCODE_A,
+  SDL_SCANCODE_S,
+  SDL_SCANCODE_D,
+  SDL_SCANCODE_Z,
+  SDL_SCANCODE_C,
+  SDL_SCANCODE_4,
+  SDL_SCANCODE_R,
+  SDL_SCANCODE_F,
+  SDL_SCANCODE_V
+};
 
 char number_hexcodes[] = {
   0xF0, 0x90, 0x90, 0x90, 0xF0,
@@ -22,10 +42,19 @@ char number_hexcodes[] = {
   0xF0, 0x80, 0xF0, 0x80, 0x80
 };
 
+int key_pressed(char key) {
+
+  const uint8_t *keyboard = SDL_GetKeyboardState(NULL);
+  uint8_t real_key = keys[(int)key];
+  
+  return keyboard[real_key];
+
+}
+
 void conversion(char *scr, uint32_t *pixels) {
 
   for(int i=0; i<SCRN_SIZE; i++)
-    pixels[i] = scr[i] ? -1 : 0;
+    pixels[i] = (scr[i]) ? -1 : 0;
 
 }
 
@@ -34,6 +63,7 @@ void initialize_chip(chip8_t *chip8) {
   memset(chip8, 0x00, sizeof(chip8_t));
   memcpy(chip8->mem + 0x50, number_hexcodes, sizeof(number_hexcodes));
   chip8->pc = 0x200;
+  chip8->wait_key = -1;
 
 }
 
@@ -152,12 +182,12 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
 
         case 0x07:
           chip8->v[0x0F] = (chip8->v[y] > chip8->v[x]);
-          chip8->v[y] -= chip8->v[x];
+          chip8->v[x] = chip8->v[y] - chip8->v[x];
           break;
 
         case 0x0E: 
-          chip8->v[0x0F] = (chip8->v[x] & (1 << 7)) ? 1 : 0;
-          chip8->v[x] <<= 1;
+          chip8->v[0x0F] = ((chip8->v[x] & 0x80) != 0);
+	  chip8->v[x] <<= 1;
           break;
       }
       break;
@@ -172,7 +202,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         break;
 
       case 0x0B:
-        chip8->pc = (chip8->pc + chip8->v[0x00] + nnn) % MEM_SIZE;
+        chip8->pc = (chip8->v[0x00] + nnn) % MEM_SIZE;
         break;
 
       case 0x0C:
@@ -183,11 +213,14 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
         chip8->v[0x0F] = 0;
 	for(int i=0; i<lsd; i++) {
 	  uint8_t sprite = chip8->mem[chip8->i + i];
-	  for(int j=0; j<7; j++) {
+	  for(int j=0; j<8; j++) {
 	    int px = (chip8->v[x] + j) & (TEXTURE_WIDTH - 1);
 	    int py = (chip8->v[y] + i) & (TEXTURE_HEIGHT - 1);
-	    chip8->v[0x0F] |= chip8->screen[TEXTURE_WIDTH * py + px] & ((sprite & (1 << (7 - j))) != 0);
-	    chip8->screen[TEXTURE_WIDTH * py + px] ^= (sprite & (1 << (7 - j))) != 0;
+            int pos = TEXTURE_WIDTH * py + px;
+	    int pixel = (sprite & (1 << (7 - j))) != 0;
+
+	    chip8->v[0x0F] |= (chip8->screen[pos] & pixel);
+	    chip8->screen[pos] ^= pixel;
 	  }
 	}
         break;
@@ -195,12 +228,15 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
       case 0x0E:
         switch(kk) {
           case 0x9E:
-            printf("SKP v[%x] (if key = v[%x])\n", x, x);
+            if(key_pressed(chip8->v[x]))
+              chip8->pc = (chip8->pc + 2) % MEM_SIZE;
             break;
 
           case 0xA1:
-            printf("SKNP v[%x] (if key != v[%x])\n", x, x);
-        }
+            if(!key_pressed(chip8->v[x]))
+	      chip8->pc = (chip8->pc + 2) % MEM_SIZE;
+            break;
+	}
         break;
 
       case 0x0F:
@@ -210,7 +246,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
             break;
 
           case 0x0A:
-            printf("LD v[%x] k (wait until key pressed)\n", x);
+	    chip8->wait_key = x;
             break;
 
           case 0x15:
@@ -230,7 +266,7 @@ void process_opcode(chip8_t *chip8, uint16_t opcode) {
             break;
 
           case 0x33:
-	    chip8->mem[chip8->i] = chip8->v[x] / 100 % 10;
+	    chip8->mem[chip8->i] = chip8->v[x] / 100;
 	    chip8->mem[chip8->i + 1] = chip8->v[x] / 10 % 10;
 	    chip8->mem[chip8->i + 2] = chip8->v[x] % 10;
             break;

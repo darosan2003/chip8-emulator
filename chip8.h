@@ -6,6 +6,7 @@
 #define REG_NUM		16
 #define STACK_SIZE	16
 #define TEXTURE_HEIGHT	32
+#define SURFACE_DEPTH   32
 #define TEXTURE_WIDTH	64
 #define SCRN_SIZE	2048
 #define MEM_SIZE	4096
@@ -13,6 +14,7 @@
 #ifndef __CHIP8__T
 #define __CHIP8__T
 typedef struct {
+  char wait_key;
   char screen[SCRN_SIZE];
   uint8_t mem[MEM_SIZE];
   uint8_t v[REG_NUM];
@@ -22,6 +24,7 @@ typedef struct {
 } chip8_t;
 #endif
 
+int key_pressed(char);
 void conversion(char *, uint32_t *);
 void initialize_chip(chip8_t *);
 void load_rom(chip8_t *, char *);
