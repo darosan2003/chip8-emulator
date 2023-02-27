@@ -88,9 +88,9 @@ void load_rom(chip8_t *chip8, char *rom_name) {
 
 void step_forward(chip8_t *chip8) {
 
-  chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
-
   uint16_t opcode = (chip8->mem[chip8->pc] << 8) | chip8->mem[chip8->pc + 1];
+  chip8->pc = (chip8->pc + 2) & (MEM_SIZE - 1);
+ 
   process_opcode(chip8, opcode);
 
 }
