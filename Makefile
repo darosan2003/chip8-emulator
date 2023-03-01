@@ -9,7 +9,7 @@ OBJ_DIR = /obj/
 # Variable to store the targets
 TARGET = chip8
 # Variable to store the objects
-OBJ = main.o chip8.o
+OBJ = main.o chip8.o opcode.o
 
 .PHONY: all
 all: dir $(TARGET)
@@ -21,7 +21,7 @@ $(TARGET): $(OBJ)
 
 %.o: %.c
 	@echo "[+] Generating the .o file..."
-	$(CC) $(CFLAGS) $<
+	@$(CC) $(CFLAGS) $<
 	@mv *.o .$(OBJ_DIR)
 
 .PHONY: clean

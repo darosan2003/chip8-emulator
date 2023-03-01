@@ -38,11 +38,8 @@ int main(int argc, char **argv) {
   while(!quit) {
 
     while(SDL_PollEvent(&ev)) {
-      switch(ev.type) {
-        case SDL_QUIT:
-	  quit = 1;
-	  break;
-      }
+      if(ev.type == SDL_QUIT)
+        quit = 1;
     }
 
     if(SDL_GetTicks() - cycles > 1) {
@@ -50,12 +47,12 @@ int main(int argc, char **argv) {
         step_forward(&chip8);
       else {
         for(int i=0; i<=0x0F; i++) {
-	  if(key_pressed(i)) {
-	    chip8.v[(int)chip8.wait_key] = i;
-	    chip8.wait_key = -1;
-	    break;
-	  }
-	}
+          if(key_pressed(i)) {
+            chip8.v[(int)chip8.wait_key] = i;
+            chip8.wait_key = -1;
+            break;
+          }
+	      }
       }
       cycles = SDL_GetTicks();
     }
